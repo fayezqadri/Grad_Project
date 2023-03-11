@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Home Page{% endblock %}
+{% block content %}
+<style>
+    .container {
+      text-align: center;
+    }
+  </style>
+<h1>American Sign Language Detection</h1>
+
+<img src="static/Cover.JPEG" alt="Different Signs of American Sign Language" width="400" height="300" style="margin-top: 20px;" >
+
+<p style="margin-top: 60px;">Please choose between recording a video online or uploading a video</p>
+<p>In both cases the vidoe should be a maximum of 1 second</p>
+
+
+	
+<a href="/Record" ><button class="btn btn-primary" style "margin-left: 100px;">Record Video  </button></a>
+<a><button class="btn btn-primary" style "margin-left: 100px;">Upload Video </button></a>
+
+
+
+{% endblock %} 
+
