@@ -1,15 +1,14 @@
 from flask import Blueprint, render_template, request, flash
+from .models import process_video, validate_db, infer_model
 
 views = Blueprint('views',__name__)
 
 @views.route('/',methods = ['GET','POST'])
 def home():
-    # if request.method == 'POST':
-    #     video = request.form
-    if (False):
-        flash("Video Found in database and print result.", category='predicted_before')
-    if(False):
-        flash("Here is the prediction of our model.",category="model_prediction")
+    if request.method == 'POST':
+        video = request.form
+
+
 
     return render_template("Home.html")
 @views.route('/Manual')

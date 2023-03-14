@@ -41,12 +41,13 @@
     navigator.mediaDevices.getUserMedia(constraints)
         .then((stream) => {
         videoPlayer.srcObject = stream;
+        window.mediaStream = stream;
         })
         .catch((err) => {
         console.error(err);
         });
 
-    let recordedChunks = [];
+    var recordedChunks = [];
 
     function handleDataAvailable(event) {
         recordedChunks.push(event.data);
@@ -54,26 +55,33 @@
 
     function startRecording() {
         recordedChunks = [];
-        const mediaRecorder = new MediaRecorder(videoPlayer.srcObject);
+        const mediaRecorder = new MediaRecorder(mediaStream);
+        window.mediaRecorder = mediaRecorder;
+        mediaRecorder.ondataavailable = (e) => {
+              // Push the recorded media data to
+              // the chunks array
+              recordedChunks.push(e.data);
+            };
         mediaRecorder.start();
 
         setTimeout(() => {
         mediaRecorder.stop();
-        mediaRecorder.addEventListener("dataavailable", handleDataAvailable);
-
+        
         const recordedBlob = new Blob(recordedChunks, { type: 'video/mp4' });
         const recordedUrl = URL.createObjectURL(recordedBlob);
-
-        reviewVideoPlayer.src = recordedUrl;
-        reviewVideoPlayer.play();   
+        window.recordedUrl = recordedUrl
         recordingSection.style.display = 'none';
         reviewSection.style.display = 'flex';
+        reviewVideoPlayer.src = recordedUrl;
+        reviewVideoPlayer.load();
+        reviewVideoPlayer.play();   
+   
         }, 2000);
     }
 
     function approveRecording() {
-  reviewSection.style.display = 'none';
-  recordingSection.style.display = 'flex';
+  reviewSection.style.display = 'flex';
+  recordingSection.style.display = 'none';
   reviewVideoPlayer.pause();
   reviewVideoPlayer.currentTime = 0;
   reviewVideoPlayer.play();
@@ -85,6 +93,7 @@
         reviewVideoPlayer.pause();
         reviewVideoPlayer.currentTime = 0;
         startRecording();
+
     }
 
     startRecordingButton.addEventListener('click', startRecording);
