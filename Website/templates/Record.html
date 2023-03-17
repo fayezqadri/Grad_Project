@@ -1,103 +1,123 @@
-    {% extends "base.html" %}
-    {% block title %}Video Recording{% endblock %}
-    {% block content %}
-    <h1>Please read the instructions below</h1>
+{% extends "base.html" %}
+{% block title %}Video Recording{% endblock %}
+{% block content %}
+<h1>Please read the instructions below</h1>
 
-    <ul>
-        <li>Check the video player below to make sure you are ready</li>
-        <li>When you are ready press the start recording button</li>
-        <li>It will record for 5 seconds and then show you the video to choose whether to approve it or not</li>
-    </ul>
+<ul>
+    <li>Check the video player below to make sure you are ready</li>
+    <li>When you are ready press the start recording button</li>
+    <li>It will record for 5 seconds and then show you the video to choose whether to approve it or not</li>
+</ul>
 
-    <h1>Webcam Video Recorder</h1>
-    <div id="recording-section" style="display:flex; align-items:center;">
-    <video id="videoPlayer" autoplay controls style="flex:1; max-width: 600px;"></video>
-    <button id="startRecordingButton" style="margin-left: 50px;" class="btn btn-primary">Start Recording</button>
+<h1>Webcam Video Recorder</h1>
+<div id="recording-section" style="display:flex; align-items:center;">
+<video id="videoPlayer" autoplay controls style="flex:1; max-width: 600px;"></video>
+<button id="startRecordingButton" style="margin-left: 50px;" class="btn btn-primary">Start Recording</button>
+</div>
+
+<div id="review-section" style="display:none; align-items:center;">
+<video id="reviewVideoPlayer" autoplay controls style="flex:1; max-width: 600px;"></video>
+<div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+    <p>Do you approve this video?</p>
+    <div>
+    <button id="approveButton" class="btn btn-primary">Approve</button>
+    <button id="recordAgainButton" class="btn btn-secondary">Record Again</button>
     </div>
+</div>
+</div>
 
-    <div id="review-section" style="display:none; align-items:center;">
-    <video id="reviewVideoPlayer" autoplay controls style="flex:1; max-width: 600px;"></video>
-    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
-        <p>Do you approve this video?</p>
-        <div>
-        <button id="approveButton" class="btn btn-primary">Approve</button>
-        <button id="recordAgainButton" class="btn btn-secondary">Record Again</button>
-        </div>
-    </div>
-    </div>
+<script>
+const videoPlayer = document.getElementById('videoPlayer');
+const reviewVideoPlayer = document.getElementById('reviewVideoPlayer');
+const startRecordingButton = document.getElementById('startRecordingButton');
+const approveButton = document.getElementById('approveButton');
+const recordAgainButton = document.getElementById('recordAgainButton');
+const recordingSection = document.getElementById('recording-section');
+const reviewSection = document.getElementById('review-section');
+const constraints = {
+    video: true
+};
 
-    <script>
-    const videoPlayer = document.getElementById('videoPlayer');
-    const reviewVideoPlayer = document.getElementById('reviewVideoPlayer');
-    const startRecordingButton = document.getElementById('startRecordingButton');
-    const approveButton = document.getElementById('approveButton');
-    const recordAgainButton = document.getElementById('recordAgainButton');
-    const recordingSection = document.getElementById('recording-section');
-    const reviewSection = document.getElementById('review-section');
-    const constraints = {
-        video: true
-    };
+navigator.mediaDevices.getUserMedia(constraints)
+    .then((stream) => {
+    videoPlayer.srcObject = stream;
+    window.mediaStream = stream;
+    })
+    .catch((err) => {
+    console.error(err);
+    });
 
-    navigator.mediaDevices.getUserMedia(constraints)
-        .then((stream) => {
-        videoPlayer.srcObject = stream;
-        window.mediaStream = stream;
-        })
-        .catch((err) => {
-        console.error(err);
-        });
+var recordedChunks = [];
 
-    var recordedChunks = [];
-
-    function handleDataAvailable(event) {
-        recordedChunks.push(event.data);
-    }
-
-    function startRecording() {
-        recordedChunks = [];
-        const mediaRecorder = new MediaRecorder(mediaStream);
-        window.mediaRecorder = mediaRecorder;
-        mediaRecorder.ondataavailable = (e) => {
-              // Push the recorded media data to
-              // the chunks array
-              recordedChunks.push(e.data);
-            };
-        mediaRecorder.start();
-
-        setTimeout(() => {
-        mediaRecorder.stop();
-        
-        const recordedBlob = new Blob(recordedChunks, { type: 'video/mp4' });
-        const recordedUrl = URL.createObjectURL(recordedBlob);
-        window.recordedUrl = recordedUrl
-        recordingSection.style.display = 'none';
-        reviewSection.style.display = 'flex';
-        reviewVideoPlayer.src = recordedUrl;
-        reviewVideoPlayer.load();
-        reviewVideoPlayer.play();   
-   
-        }, 2000);
-    }
-
-    function approveRecording() {
-  reviewSection.style.display = 'flex';
-  recordingSection.style.display = 'none';
-  reviewVideoPlayer.pause();
-  reviewVideoPlayer.currentTime = 0;
-  reviewVideoPlayer.play();
+function handleDataAvailable(event) {
+    recordedChunks.push(event.data);
 }
 
-    function recordAgain() {
-        reviewSection.style.display = 'none';
-        recordingSection.style.display = 'flex';
-        reviewVideoPlayer.pause();
-        reviewVideoPlayer.currentTime = 0;
-        startRecording();
+function startRecording() {
+    recordedChunks = [];
+    const mediaRecorder = new MediaRecorder(mediaStream);
+    window.mediaRecorder = mediaRecorder;
+    mediaRecorder.ondataavailable = (e) => {
+          // Push the recorded media data to
+          // the chunks array
+          recordedChunks.push(e.data);
+        };
+    mediaRecorder.start();
 
-    }
+    setTimeout(() => {
+    mediaRecorder.stop();
+    
+    const recordedBlob = new Blob(recordedChunks, { type: 'video/mp4' });
+    const recordedUrl = URL.createObjectURL(recordedBlob);
+    window.recordedUrl = recordedUrl
+    recordingSection.style.display = 'none';
+    reviewSection.style.display = 'flex';
+    reviewVideoPlayer.src = recordedUrl;
+    reviewVideoPlayer.load();
+    reviewVideoPlayer.play();   
 
-    startRecordingButton.addEventListener('click', startRecording);
-    approveButton.addEventListener('click', approveRecording);
-    recordAgainButton.addEventListener('click', recordAgain);
-    </script>
-    {% endblock %}
+    }, 2000);
+}
+
+function approveRecording() {
+  const formData = new FormData();
+  formData.append('video', new Blob(recordedChunks, { type: 'video/mp4' }));
+
+  fetch('/Record', {
+    method: 'POST',
+    body: formData
+  })
+  .then((response) => {
+    // Handle the response from the server
+    console.log(response);
+  })
+  .catch((error) => {
+    // Handle any errors that occur during the fetch request
+    console.error(error);
+  });
+
+  // Hide the review section and reset the video player
+  reviewSection.style.display = 'none';
+  reviewVideoPlayer.pause();
+  reviewVideoPlayer.currentTime = 0;
+
+//   // Show the recording section again and start recording
+//   recordingSection.style.display = 'flex';
+//   startRecording();
+}
+
+
+function recordAgain() {
+    reviewSection.style.display = 'none';
+    recordingSection.style.display = 'flex';
+    reviewVideoPlayer.pause();
+    reviewVideoPlayer.currentTime = 0;
+    startRecording();
+
+}
+
+startRecordingButton.addEventListener('click', startRecording);
+approveButton.addEventListener('click', approveRecording);
+recordAgainButton.addEventListener('click', recordAgain);
+</script>
+{% endblock %}

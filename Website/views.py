@@ -5,8 +5,14 @@ views = Blueprint('views',__name__)
 
 @views.route('/',methods = ['GET','POST'])
 def home():
-    if request.method == 'POST':
-        video = request.form
+    # if request.method == 'POST':
+    #     video = request.form
+    #     processed = process_video(video)
+    #     db_dict = validate_db(processed)
+    #     if (db_dict[0]==False):
+    #         infer_model(processed)
+
+
 
 
 
@@ -17,6 +23,12 @@ def Manual():
 @views.route('/About')
 def About():
     return render_template("About.html")
-@views.route('/Record')
+@views.route('/Record',methods = ['GET','POST'])
 def Record():
+    # if request.method == 'POST':
+    #     video = request.form
+    #     processed = process_video(video)
+    #     db_dict = validate_db(processed)
+    #     if (db_dict[0]==False):
+    #         infer_model(processed)
     return render_template("Record.html")

@@ -1,68 +1,84 @@
 {% extends "base.html" %}
 {% block title %}Home Page{% endblock %}
 {% block content %}
+
 <style>
     .container {
       text-align: center;
     }
+    .upload-container {
+      display: none;
+    }
+
+    
+    
 </style>
 <h1>American Sign Language Detection</h1>
-
 <img src="static/Cover.JPEG" alt="Different Signs of American Sign Language" width="400" height="300" style="margin-top: 20px;" >
-
 <p style="margin-top: 60px;">Please choose between recording a video online or uploading a video</p>
 <p>In both cases the video should be a maximum of 1 second</p>
-
 <a href="/Record"><button class="btn btn-primary" style="margin-left: 100px;">Record Video</button></a>
-<button class="btn btn-primary" onclick="uploadFunction()">Upload Video</button>
+<button class="btn btn-primary" onclick="toggleUpload()">Upload Video</button>
 
-<div id="file-upload-form" style="display: none;">
-    <form action="/" method="post" enctype="multipart/form-data" onsubmit="return validateFile()">
-        <input type="file" name="file" accept="video/mp4">
-        <input type="submit" value="Upload">
-    </form>
+<div class="upload-container">
+  <input type="file" id="video" accept="video/mp4" />
+  <button class="btn btn-primary" onclick="uploadVideo()">Upload</button>
 </div>
-
 <script>
-function uploadFunction() {
-    var shownSection = document.getElementsByTagName("p")[0];
-    shownSection.style.display = 'none';
+function toggleUpload() {
+  var uploadContainer = document.querySelector('.upload-container');
+  if (uploadContainer.style.display === "none") {
+    uploadContainer.style.display = "block";
+  } else {
+    uploadContainer.style.display = "none";
+  }
 
-    var formSection = document.getElementById('file-upload-form');
-    formSection.style.display = 'block';
 }
 
-function validateFile() {
-    var fileInput = document.querySelector('input[type="file"]');
-    if (fileInput.files.length > 0) {
-        var file = fileInput.files[0];
-        var fileSize = file.size;
-        var fileType = file.type;
-        var fileTypeParts = fileType.split('/');
-        var fileExtension = fileTypeParts[1].toLowerCase();
-        var maxFileSize = 1000000; // 1MB
-        var maxDuration = 1; // in seconds
 
-        if (fileSize > maxFileSize) {
-            alert('The file size should not exceed 1MB.');
-            return false;
-        }
-        if (fileExtension !== 'mp4') {
-            alert('The file should be in mp4 format.');
-            return false;
-        }
+function uploadVideo() {
+  // Get the input element
+  var input = document.getElementById("video");
 
-        var video = document.createElement('video');
-        var URL = window.URL || window.webkitURL;
-        video.src = URL.createObjectURL(file);
-        video.onloadedmetadata = function() {
-            if (video.duration > maxDuration) {
-                alert('The video duration should not exceed 1 second.');
-                return false;
-            }
-            URL.revokeObjectURL(video.src);
-        };
+  // Check if a file has been selected
+  if (input.files.length > 0) {
+    // Get the first file
+    var file = input.files[0];
+
+    // Check if the file is an MP4 video
+    if (file.type === "video/mp4") {
+      // Create a video element
+      var video = document.createElement('video');
+
+      // Set the video source to the file object
+      video.src = URL.createObjectURL(file);
+
+      // Wait for the video to load metadata
+      video.onloadedmetadata = function() {
+        // Check if the video is less than or equal to 1 second in length
+        if (video.duration <= 3) {
+          // Create a FormData object
+          var formData = new FormData();
+
+          // Add the video file to the form data
+          formData.append("video", file);
+
+          // Send the form data to the server using a POST method
+          var xhr = new XMLHttpRequest();
+          xhr.open("POST", "/");
+          xhr.send(formData);
+
+                  // Hide the upload container
+        var uploadContainer = document.querySelector('.upload-container');
+        uploadContainer.style.display = "none"; 
+        } else {
+          alert("The video must be 2 second or less in length.");
+        }
+      };
+    } else {
+      alert("The file must be an MP4 video.");
     }
+  }
 }
 </script>
 {% endblock %}
