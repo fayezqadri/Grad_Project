@@ -9,8 +9,6 @@
     .upload-container {
       display: none;
     }
-
-    
     
 </style>
 <h1>American Sign Language Detection</h1>
@@ -21,8 +19,11 @@
 <button class="btn btn-primary" onclick="toggleUpload()">Upload Video</button>
 
 <div class="upload-container">
-  <input type="file" id="video" accept="video/mp4" />
-  <button class="btn btn-primary" onclick="uploadVideo()">Upload</button>
+  <form method="POST" enctype="multipart/form-data" action="/">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <input type="file" id="video" name = "video" accept="video/mp4" />
+    <button class="btn btn-primary" onclick="uploadVideo()">Upload</button>
+  </form>
 </div>
 <script>
 function toggleUpload() {
@@ -32,7 +33,6 @@ function toggleUpload() {
   } else {
     uploadContainer.style.display = "none";
   }
-
 }
 
 
@@ -68,9 +68,9 @@ function uploadVideo() {
           xhr.open("POST", "/");
           xhr.send(formData);
 
-                  // Hide the upload container
-        var uploadContainer = document.querySelector('.upload-container');
-        uploadContainer.style.display = "none"; 
+          // Hide the upload container
+          var uploadContainer = document.querySelector('.upload-container');
+          uploadContainer.style.display = "none"; 
         } else {
           alert("The video must be 2 second or less in length.");
         }
