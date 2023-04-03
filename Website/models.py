@@ -16,50 +16,39 @@ import os
 
 
 
-# def process_video(video):
-#     video_array = None
-#     try:
-#         video_buffer = io.BytesIO()
-#         video.save(video_buffer)
-#         video_array = np.frombuffer(video_buffer.getvalue(), dtype=np.uint8)
-#         return video_array
-#     except Exception as e:
-#         print(str(e))
-#         return 'Failed to decode video', 400
+# def process_video(video_file):
+#     # Save BytesIO object to temporary file
+#     tmp = tempfile.NamedTemporaryFile(delete=False)
+#     tmp.write(video_file.read())
+#     tmp.close()
 
-def process_video(video_file):
-    # Save BytesIO object to temporary file
-    tmp = tempfile.NamedTemporaryFile(delete=False)
-    tmp.write(video_file.read())
-    tmp.close()
+#     # Probe the video with ffmpeg
+#     probe = ffmpeg.probe(tmp.name)
+#     video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
 
-    # Probe the video with ffmpeg
-    probe = ffmpeg.probe(tmp.name)
-    video_info = next(s for s in probe['streams'] if s['codec_type'] == 'video')
+#     # Get video metadata
+#     width = int(video_info['width'])
+#     height = int(video_info['height'])
+#     fps = int(eval(video_info['avg_frame_rate']))
+#     num_frames = int(float(video_info['duration']) * fps)
 
-    # Get video metadata
-    width = int(video_info['width'])
-    height = int(video_info['height'])
-    fps = int(eval(video_info['avg_frame_rate']))
-    num_frames = int(float(video_info['duration']) * fps)
+#     # Extract frames as numpy array
+#     out, _ = (
+#         ffmpeg
+#         .input(tmp.name)
+#         .output('pipe:', format='rawvideo', pix_fmt='rgb24')
+#         .run(capture_stdout=True)
+#     )
+#     video_array = (
+#         np
+#         .frombuffer(out, np.uint8)
+#         .reshape([-1, height, width, 3])
+#     )
 
-    # Extract frames as numpy array
-    out, _ = (
-        ffmpeg
-        .input(tmp.name)
-        .output('pipe:', format='rawvideo', pix_fmt='rgb24')
-        .run(capture_stdout=True)
-    )
-    video_array = (
-        np
-        .frombuffer(out, np.uint8)
-        .reshape([-1, height, width, 3])
-    )
+#     # Delete temporary file
+#     os.unlink(tmp.name)
 
-    # Delete temporary file
-    os.unlink(tmp.name)
-
-    return video_array
+#     return video_array
 
     #return video_array, fps, num_frames, width, height
     # video = io.BytesIO(video_file)
@@ -82,6 +71,17 @@ def process_video(video_file):
     # container.close()
     # frames = np.array(frames)
     
+
+def process_video(video):
+    video_array = None
+    try:
+        video_buffer = io.BytesIO()
+        video.save(video_buffer)
+        video_array = np.frombuffer(video_buffer.getvalue(), dtype=np.uint8)
+        return video_array
+    except Exception as e:
+        print(str(e))
+        return 'Failed to decode video', 400
 
 
 
