@@ -83,7 +83,31 @@ def process_video(video):
         print(str(e))
         return 'Failed to decode video', 400
 
+def convert_vid_to_array(video) -> np.array:
+    # proccess = (
+    #     ffmpeg.probe('pipe:')
+    # )
+    try:
+        proccess = (
+            ffmpeg
+            .input('pipe:')
+            .video
+            .filter('scale', r'320:240')
+            .output('test-vid.mp4',)
+            .run(input=video)
+        )
+    except ffmpeg.Error as e:
+        print('stdout:', e.stdout.decode('utf8'))
+        print('stderr:', e.stderr.decode('utf8'))
+        raise e
 
+    # proccess = (
+    #     ffmpeg
+    #     .input('pipe:')
+    #     .output('pipe:', format='rawvideo')
+    #     .run_async(pipe_stdin=True, pipe_stdout=True)
+    # )
+    # return type(proccess.run(input=video))
 
     
 
