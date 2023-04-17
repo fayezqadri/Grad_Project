@@ -3,21 +3,54 @@
 {% block content %}
 
 <style>
+ 
     .container {
       text-align: center;
     }
     .upload-container {
       display: none;
     }
+    .body{
+      background-color: rgb(13, 46, 46);
+    }
+      .button-container {
+        display: flex;
+
+    margin-left: 340px;
+  }
+  .image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.vertical-line {
+  width: 2px;
+  height: 300px;
+  background-color: black;
+  margin: 0 20px;
+}
+
+
+    
     
 </style>
 <h1>American Sign Language Detection</h1>
-<img src="static/Cover.JPEG" alt="Different Signs of American Sign Language" width="400" height="300" style="margin-top: 20px;" >
+<div class="image-container">
+
+<!-- <img src="static/Cover.JPEG" alt="Different Signs of American Sign Language" width="400" height="300" style="margin-top: 20px;" > -->
+<img src="static/Cover.JPEG" alt="Different Signs of American Sign Language" width="300" height="300">
+<div class="vertical-line"></div>
+<img src="static/Psut_Logo.jpg" alt="Second Image" width="300" height="300">
+</div>
+
 <p style="margin-top: 60px;">Please choose between recording a video online or uploading a video</p>
 <p>In both cases the video should be a maximum of 1 second</p>
+<div class="button-container">
 <a href="/Record"><button class="btn btn-primary" style="margin-left: 100px;">Record Video</button></a>
 <button class="btn btn-primary" onclick="toggleUpload()">Upload Video</button>
-
+</div>
 <div class="upload-container">
   <form method="POST" enctype="multipart/form-data" action="/">
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
