@@ -5,6 +5,8 @@ import hashlib
 import ffmpeg
 import os 
 
+lambda_endpoint_url = "/"
+
 
 
 vid_res = (480, 480) # WxH
@@ -34,26 +36,28 @@ def process_video(video_bytes):
         print('stderr:', e.stderr.decode('utf8'))
         raise e
 
-client = boto3.client('dynamodb')
-
+table_name = os.environ.get('TABLE_NAME')
 def get_prediction(processed):
 
     processed = np.random.rand(24,240,240,3)
-    table_name = 'my-table'
+    dynamodb = boto3.resource('dynamodb')
+    table = dynamodb.Table(table_name)
 
     processed_bytes = processed.tobytes()
     hash_video = hashlib.md5(processed_bytes)
     hash_video = hash_video.hexdigest()
-    response = client.get_item(
-        TableName = table_name,
-        Key = {
-        "Key_Column_Name":{'S':hash_video}} )
+    response = table.get_item(Key={'hash_key': hash_video})
+
     if 'Item' in response:
-        prediction = response['Item']['prediction_column_name']['S']
-        return prediction
+        # The hash exists in the table, return the value
+        return response['Item']['value']
     else:
         #### Send processed to FAST- API 
-        return 1 
+        pred = 1
+
+        table.put_item(Item={'hash_key': hash_video, 'value': pred })
+        
+        return pred 
 
 
 

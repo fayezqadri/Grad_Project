@@ -34,3 +34,7 @@ def Record():
 
     return render_template("Record.html")
 
+@views.route('/healthy')
+def healthy():
+    # We can check the system health here 
+    return 'OK', 200    
