@@ -1,15 +1,9 @@
 import boto3
-from fastapi import FastAPI
-import cv2
 import numpy as np
 import hashlib
-import io 
-import subprocess
-from moviepy.editor import VideoFileClip
-import imghdr
-import tempfile
+import io
 import ffmpeg
-import os 
+import subprocess
 
 
 
@@ -70,7 +64,7 @@ import os
     #     frames.append(frame)
     # container.close()
     # frames = np.array(frames)
-    
+
 
 def process_video(video):
     video_array = None
@@ -83,41 +77,44 @@ def process_video(video):
         print(str(e))
         return 'Failed to decode video', 400
 
-def convert_vid_to_array(video) -> np.array:
-    # proccess = (
-    #     ffmpeg.probe('pipe:')
-    # )
+def convert_vid_to_array(video_bytes: bytes) -> np.array:
+    vid_res = (480, 480) # WxH
+    vid_duration = 2 # seconds
+    total_output_frames = 25
+
     try:
-        proccess = (
+        process = (
             ffmpeg
             .input('pipe:')
             .video
-            .filter('scale', r'320:240')
-            .output('test-vid.mp4',)
-            .run(input=video)
+            .trim(duration=vid_duration)
+            .filter('framerate', fps=total_output_frames/vid_duration)
+            .filter('scale', f'{vid_res[0]}x{vid_res[1]}')
+            .filter('setsar', ratio=f'{vid_res[0]}/{vid_res[1]}')
+            .output('pipe:', format='rawvideo', pix_fmt='rgb24')
+            # .run_async(pipe_stdin=True, pipe_stdout=True)
         )
+
+        vid_raw, _ = process.run(input=video_bytes, capture_stdout=True)
+        vid_arr = np.frombuffer(vid_raw, np.uint8).reshape((-1, vid_res[1], vid_res[0], 3))
+
+        return vid_arr.shape
+
     except ffmpeg.Error as e:
         print('stdout:', e.stdout.decode('utf8'))
         print('stderr:', e.stderr.decode('utf8'))
         raise e
 
-    # proccess = (
-    #     ffmpeg
-    #     .input('pipe:')
-    #     .output('pipe:', format='rawvideo')
-    #     .run_async(pipe_stdin=True, pipe_stdout=True)
-    # )
-    # return type(proccess.run(input=video))
 
-    
+
 
 def validate_db(processed):
-    ## hash video 
-    ## check database for hash 
-    ## return True and result 
+    ## hash video
+    ## check database for hash
+    ## return True and result
     temp = 1
 
 def infer_model(processes):
     temp = 1
-    ## callback if not found in database 
-    ##  send processes video to lamda using Fast API 
+    ## callback if not found in database
+    ##  send processes video to lamda using Fast API

@@ -56,20 +56,20 @@ function handleDataAvailable(event) {
 
 async function startRecording() {
   recordedChunks = [];
-  
+
   const mediaRecorder = new MediaRecorder(streamObject);
   mediaRecorder.ondataavailable = async (e) => {
     //this event is fired after stopping the recorder in couple of seconds
     //thats we was rendering an empty video so we show the video when we have data
     if(e.data.size > 0){
       recordedChunks.push(e.data);
-      const recordedBlob = new Blob(recordedChunks, { type: 'video/mp4' });
+      const recordedBlob = new Blob(recordedChunks, { type: recordedChunks[0].type });
       const recordedUrl = window.webkitURL.createObjectURL(recordedBlob);
       recordingSection.style.display = 'none';
       reviewSection.style.display = 'flex';
       reviewVideoPlayer.src = recordedUrl;
-      await reviewVideoPlayer.load(); 
-      await reviewVideoPlayer.play();   
+      await reviewVideoPlayer.load();
+      await reviewVideoPlayer.play();
     }
   };
 
@@ -82,14 +82,14 @@ async function startRecording() {
       resolve();
     }, 2000);
   });
- 
+
 }
 
 
 
 function approveRecording() {
   const formData = new FormData();
-  formData.append('video', new Blob(recordedChunks, { type: 'video/mp4' }));
+  formData.append('video', new Blob(recordedChunks, { type: recordedChunks[0].type }));
 
   fetch('/Record', {
     method: 'POST',

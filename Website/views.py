@@ -1,7 +1,6 @@
 from flask import Blueprint, render_template, request, flash
 from .models import process_video, convert_vid_to_array, validate_db, infer_model
 import numpy as np
-import cv2
 
 views = Blueprint('views',__name__)
 
@@ -15,7 +14,7 @@ def home():
         processed = process_video(video_file)
         flash(processed.shape)
         #processed = process_video
-        
+
         #python main.py
         # print(processed)
     #     db_dict = validate_db(processed)
@@ -33,13 +32,22 @@ def Record():
     print('enter record')
     if request.method == 'POST':
         video_file = request.files.get('video')
-        print(convert_vid_to_array(video_file.stream.read()))
+        print(video_file)
+        print(type(video_file))
+        print(dir(video_file))
+        print(video_file.headers)
+        print(video_file.mimetype)
+        print(video_file.mimetype_params)
+        print(video_file.content_type)
+        print(video_file.content_length)
         if not video_file:
             flash("No video Ile Found !")
             return 'No video file uploaded !', 400
         else:
-            processed = process_video(video_file)
-            flash(processed.shape)
+            video_file_bytes = video_file.stream.read()
+            print(convert_vid_to_array(video_file_bytes))
+            # processed = process_video(video_file)
+            # flash(processed.shape)
     # if request.method == 'POST':
     #     video = request.form
     #     processed = process_video(video)
