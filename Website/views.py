@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, redirect, url_for
 from .models import get_vid_arr_from_bytes, get_classification, get_inference
 import hashlib
 
@@ -29,8 +29,9 @@ def Record():
         video_file = request.files.get('video')
         if not video_file:
             return 'No video file uploaded !', 400
-        video_file = video_file.read()
-        vid_arr = get_vid_arr_from_bytes(video_file)
+        vid_bytes = video_file.stream.read()
+        vid_arr = get_vid_arr_from_bytes(vid_bytes)
+        print(vid_arr.shape)
         # flash(get_classification(vid_arr))
         digest_from_inference_api = get_inference(vid_arr)
         local_digest = hashlib.md5(vid_arr.tobytes()).hexdigest()

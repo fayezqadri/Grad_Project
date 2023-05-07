@@ -1,117 +1,130 @@
-{% extends "base.html" %}
-{% block title %}Home Page{% endblock %}
-{% block content %}
+  {% extends "base.html" %}
+  {% block title %}Home Page{% endblock %}
+  {% block content %}
 
-<style>
- 
-    .container {
-      text-align: center;
-    }
-    .upload-container {
-      display: none;
-    }
-    .body{
-      background-color: rgb(13, 46, 46);
-    }
-      .button-container {
-        display: flex;
+  <style>
+  
+      .container {
+        text-align: center;
+      }
+      .upload-container {
+        display: none;
+      }
+      .body{
+        background-color: rgb(13, 46, 46);
+      }
+        .button-container {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          
 
-    margin-left: 340px;
+      
+    }
+    .image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
   }
-  .image-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-}
 
-.vertical-line {
-  width: 2px;
-  height: 300px;
-  background-color: black;
-  margin: 0 20px;
-}
-
-
-    
-    
-</style>
-<h1>American Sign Language Detection</h1>
-<div class="image-container">
-
-<!-- <img src="static/Cover.JPEG" alt="Different Signs of American Sign Language" width="400" height="300" style="margin-top: 20px;" > -->
-<img src="static/Cover.JPEG" alt="Different Signs of American Sign Language" width="300" height="300">
-<div class="vertical-line"></div>
-<img src="static/Psut_Logo.jpg" alt="Second Image" width="300" height="300">
-</div>
-
-<p style="margin-top: 60px;">Please choose between recording a video online or uploading a video</p>
-<p>In both cases the video should be a maximum of 1 second</p>
-<div class="button-container">
-<a href="/Record"><button class="btn btn-primary" style="margin-left: 100px;">Record Video</button></a>
-<button class="btn btn-primary" onclick="toggleUpload()">Upload Video</button>
-</div>
-<div class="upload-container">
-  <form method="POST" enctype="multipart/form-data" action="/">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <input type="file" id="video" name = "video" accept="video/mp4" />
-    <button class="btn btn-primary" onclick="uploadVideo()">Upload</button>
-  </form>
-</div>
-<script>
-function toggleUpload() {
-  var uploadContainer = document.querySelector('.upload-container');
-  if (uploadContainer.style.display === "none") {
-    uploadContainer.style.display = "block";
-  } else {
-    uploadContainer.style.display = "none";
+  .vertical-line {
+    width: 2px;
+    height: 300px;
+    background-color: black;
+    margin: 0 20px;
   }
-}
 
 
-function uploadVideo() {
-  // Get the input element
-  var input = document.getElementById("video");
+      
+      
+  </style>
+  <h1>American Sign Language Detection</h1>
+  <div class="image-container">
 
-  // Check if a file has been selected
-  if (input.files.length > 0) {
-    // Get the first file
-    var file = input.files[0];
+  <!-- <img src="static/Cover.JPEG" alt="Different Signs of American Sign Language" width="400" height="300" style="margin-top: 20px;" > -->
+  <img src="static/Cover.JPEG" alt="Different Signs of American Sign Language" width="25%" height="25%">
+  <div class="vertical-line"></div>
+  <img src="static/Psut_Logo.jpg" alt="Second Image" width="25%" height="25%">
+  </div>
 
-    // Check if the file is an MP4 video
-    if (file.type === "video/mp4") {
-      // Create a video element
-      var video = document.createElement('video');
+  <p style="margin-top: 60px;">Please choose between recording a video online or uploading a video</p>
+  <p>In both cases the video should be a maximum of 1 second</p>
+  <br>
+  <div class="button-container">
+  <a href="/Record"><button class="btn btn-primary" >Record Video</button></a>
+  <button style="margin-left: 15px;"class="btn btn-primary" onclick="toggleUpload()">Upload Video</button>
+  </div>
+  <div class="upload-container">
+    <br>
+    <br>  
+    <form method="POST" enctype="multipart/form-data" action="/">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <input type="file" id="video" name = "video" accept="video/mp4" />
+      <button class="btn btn-primary" onclick="uploadVideo()">Upload</button>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
+      <br>
 
-      // Set the video source to the file object
-      video.src = URL.createObjectURL(file);
-
-      // Wait for the video to load metadata
-      video.onloadedmetadata = function() {
-        // Check if the video is less than or equal to 1 second in length
-        if (video.duration <= 3) {
-          // Create a FormData object
-          var formData = new FormData();
-
-          // Add the video file to the form data
-          formData.append("video", file);
-
-          // Send the form data to the server using a POST method
-          var xhr = new XMLHttpRequest();
-          xhr.open("POST", "/");
-          xhr.send(formData);
-
-          // Hide the upload container
-          var uploadContainer = document.querySelector('.upload-container');
-          uploadContainer.style.display = "none"; 
-        } else {
-          alert("The video must be 2 second or less in length.");
-        }
-      };
+    </form>
+  </div>
+  <script>
+  function toggleUpload() {
+    var uploadContainer = document.querySelector('.upload-container');
+    if (uploadContainer.style.display === "none") {
+      uploadContainer.style.display = "block";
     } else {
-      alert("The file must be an MP4 video.");
+      uploadContainer.style.display = "none";
     }
   }
-}
-</script>
-{% endblock %}
+
+
+  function uploadVideo() {
+    // Get the input element
+    var input = document.getElementById("video");
+
+    // Check if a file has been selected
+    if (input.files.length > 0) {
+      // Get the first file
+      var file = input.files[0];
+
+      // Check if the file is an MP4 video
+      if (file.type === "video/mp4") {
+        // Create a video element
+        var video = document.createElement('video');
+
+        // Set the video source to the file object
+        video.src = URL.createObjectURL(file);
+
+        // Wait for the video to load metadata
+        video.onloadedmetadata = function() {
+          // Check if the video is less than or equal to 1 second in length
+          if (video.duration <= 3) {
+            // Create a FormData object
+            var formData = new FormData();
+
+            // Add the video file to the form data
+            formData.append("video", file);
+
+            // Send the form data to the server using a POST method
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "/");
+            xhr.send(formData);
+
+            // Hide the upload container
+            var uploadContainer = document.querySelector('.upload-container');
+            uploadContainer.style.display = "none"; 
+          } else {
+            alert("The video must be 2 second or less in length.");
+          }
+        };
+      } else {
+        alert("The file must be an MP4 video.");
+      }
+    }
+  }
+  </script>
+  {% endblock %}

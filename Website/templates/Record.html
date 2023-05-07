@@ -1,23 +1,29 @@
 {% extends "base.html" %}
 {% block title %}Video Recording{% endblock %}
 {% block content %}
-<h1>Please read the instructions below</h1>
+<div style="text-align:center;">
+  <h1>Please read the instructions below</h1>
 
-<ul>
-    <li>Check the video player below to make sure you are ready</li>
-    <li>When you are ready press the start recording button</li>
-    <li>It will record for 5 seconds and then show you the video to choose whether to approve it or not</li>
-</ul>
+  <div style="text-align: center;">
+    <ul style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+      <li>Check the video player below to make sure you are ready</li>
+      <li>When you are ready press the start recording button</li>
+      <li>It will record for 5 seconds and then show you the video to choose whether to approve it or not</li>
+    </ul>
+  </div>
 
-<h1>Webcam Video Recorder</h1>
-<div id="recording-section" style="display:flex; align-items:center;">
-<video id="videoPlayer" autoplay controls style="flex:1; max-width: 600px;"></video>
-<button id="startRecordingButton" style="margin-left: 50px;" class="btn btn-primary">Start Recording</button>
+<h1 style = "text-align: center;">Webcam Video Recorder</h1>
+<div id="recording-section" style="display:flex; flex-direction: column; align-items:center; justify-content: center;">
+  <video id="videoPlayer" autoplay controls style="flex:1; max-width: 85%;"></video>
+  <button id="startRecordingButton" style="margin-top: 50px;" class="btn btn-primary">Start Recording</button>
 </div>
 
-<div id="review-section" style="display:none; align-items:center;">
-<video id="reviewVideoPlayer" autoplay controls style="flex:1; max-width: 600px;"></video>
+<div id="review-section" style="display:none; flex-direction: column; align-items:center; justify-content: center;">
+<video id="reviewVideoPlayer" autoplay controls style="flex:1; max-width: 85%;"></video>
 <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+  <br>
+  <br>
+  
     <p>Do you approve this video?</p>
     <div>
     <button id="approveButton" class="btn btn-primary">Approve</button>
@@ -25,6 +31,13 @@
     </div>
 </div>
 </div>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
 
 <script>
 const videoPlayer = document.getElementById('videoPlayer');
@@ -80,7 +93,7 @@ async function startRecording() {
     setTimeout(async () => {
       await mediaRecorder.stop();
       resolve();
-    }, 2000);
+    }, 3000);
   });
 
 }
