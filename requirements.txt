@@ -3,3 +3,4 @@ numpy
 boto3
 ffmpeg-python
 Flask-WTF
+gunicorn
