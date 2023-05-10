@@ -7,4 +7,4 @@ app = create_app()
 app.jinja_env.globals['csrf_token'] = generate_csrf
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', debug=True)
