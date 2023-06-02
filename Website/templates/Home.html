@@ -3,7 +3,7 @@
   {% block content %}
 
   <style>
-  
+
       .container {
         text-align: center;
       }
@@ -17,9 +17,9 @@
           display: flex;
           align-items: center;
           justify-content: center;
-          
 
-      
+
+
     }
     .image-container {
     display: flex;
@@ -36,8 +36,8 @@
   }
 
 
-      
-      
+
+
   </style>
   <h1>American Sign Language Detection</h1>
   <div class="image-container">
@@ -57,10 +57,10 @@
   </div>
   <div class="upload-container">
     <br>
-    <br>  
+    <br>
     <form method="POST" enctype="multipart/form-data" action="/">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-      <input type="file" id="video" name = "video" accept="video/mp4" />
+      <input type="file" id="video" name = "video" accept="video/webm" />
       <button class="btn btn-primary" onclick="uploadVideo()">Upload</button>
       <br>
       <br>
@@ -92,7 +92,7 @@
       var file = input.files[0];
 
       // Check if the file is an MP4 video
-      if (file.type === "video/mp4") {
+      if (file.type === "video/webm") {
         // Create a video element
         var video = document.createElement('video');
 
@@ -109,14 +109,26 @@
             // Add the video file to the form data
             formData.append("video", file);
 
-            // Send the form data to the server using a POST method
+            {{/*  // Send the form data to the server using a POST method
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "/");
-            xhr.send(formData);
+            xhr.send(formData);  */}}
+            fetch('/', {
+              method: 'POST',
+              body: formData
+            })
+            .then((response) => {
+              // Handle the response from the server
+              console.log(response);
+            })
+            .catch((error) => {
+              // Handle any errors that occur during the fetch request
+              console.error(error);
+            });
 
             // Hide the upload container
             var uploadContainer = document.querySelector('.upload-container');
-            uploadContainer.style.display = "none"; 
+            uploadContainer.style.display = "none";
           } else {
             alert("The video must be 2 second or less in length.");
           }

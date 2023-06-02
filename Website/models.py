@@ -13,8 +13,8 @@ VID_WIDTH = int(os.environ.get('VID_WIDTH', default=240))
 VID_DURATION = int(os.environ.get('VID_DURATION', default=2))
 TOTAL_OUTPUT_FRAMES = int(os.environ.get('TOTAL_OUTPUT_FRAMES', default=25))
 
-# DYNAMODB_CLIENT = boto3.resource('dynamodb')
-# DYNAMODB_CACHE_TABLE = DYNAMODB_CLIENT.Table(CACHE_DYNAMODB_TABLE_NAME)
+DYNAMODB_CLIENT = boto3.resource('dynamodb')
+DYNAMODB_CACHE_TABLE = DYNAMODB_CLIENT.Table(CACHE_DYNAMODB_TABLE_NAME)
 
 
 process = (
@@ -45,17 +45,17 @@ def get_vid_arr_from_bytes(video_bytes: bytes) -> "np.ndarray[np.uint8].shape[TO
 def get_classification(vid_arr: "np.ndarray[np.uint8].shape[TOTAL_OUTPUT_FRAMES, VID_HEIGHT, VID_WIDTH, 3]") -> str:
     vid_arr_hash_hexdigest = hashlib.md5(vid_arr.tobytes()).hexdigest()
 
-    # cached_response = DYNAMODB_CACHE_TABLE.get_item(Key={'hash_key': vid_arr_hash_hexdigest})
-    # if 'Item' in cached_response:
-    #     return cached_response['Item']['class']
-    # else:
-    #     pred = get_inference(vid_arr)
-    #     DYNAMODB_CACHE_TABLE.put_item(Item={'hash_key': vid_arr_hash_hexdigest, 'class': pred })
-    #     return pred
+    cached_response = DYNAMODB_CACHE_TABLE.get_item(Key={'np-array-hash': vid_arr_hash_hexdigest})
+    if 'Item' in cached_response:
+        return cached_response['Item']['class']
+    else:
+        pred = get_inference(vid_arr)
+        DYNAMODB_CACHE_TABLE.put_item(Item={'np-array-hash': vid_arr_hash_hexdigest, 'class': pred })
+        return pred
 
 
 def get_inference(vid_arr: "np.ndarray[np.uint8].shape[TOTAL_OUTPUT_FRAMES, VID_HEIGHT, VID_WIDTH, 3]") -> str:
     return 234
-    # reponse = requests.post(ML_API_DNS_NAME+ML_API_BASE_PATH+'video-classification', data=vid_arr.tobytes())
-    # return reponse.json()['predicted_class']
+    reponse = requests.post(ML_API_DNS_NAME+ML_API_BASE_PATH+'video-classification', data=vid_arr.tobytes())
+    return reponse.json()['predicted_class']
 

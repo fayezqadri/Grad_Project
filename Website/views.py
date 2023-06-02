@@ -11,8 +11,8 @@ def home():
         video_file = request.files.get('video')
         if not video_file:
             return 'No video file uploaded !', 400
-        video_file = video_file.read()
-        processed = get_vid_arr_from_bytes(video_file)
+        video_bytes = video_file.stream.read()
+        processed = get_vid_arr_from_bytes(video_bytes)
         flash(get_classification(processed))
 
     return render_template("Home.html")
