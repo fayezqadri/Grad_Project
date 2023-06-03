@@ -8,12 +8,12 @@ views = Blueprint('views',__name__)
 @views.route('/',methods = ['GET','POST'])
 def home():
     if request.method == 'POST':
-        video_file = request.files.get('video')
-        if not video_file:
+        vid_file = request.files.get('video')
+        if not vid_file:
             return 'No video file uploaded !', 400
-        video_bytes = video_file.stream.read()
-        processed = get_vid_arr_from_bytes(video_bytes)
-        flash(get_classification(processed))
+        vid_bytes = vid_file.stream.read()
+        vid_arr = get_vid_arr_from_bytes(vid_bytes)
+        flash(get_classification(vid_arr))
 
     return render_template("Home.html")
 @views.route('/Manual')
@@ -26,16 +26,15 @@ def About():
 def Record():
     print('enter record')
     if request.method == 'POST':
-        video_file = request.files.get('video')
-        if not video_file:
+        vid_file = request.files.get('video')
+        if not vid_file:
             return 'No video file uploaded !', 400
-        vid_bytes = video_file.stream.read()
+        vid_bytes = vid_file.stream.read()
         vid_arr = get_vid_arr_from_bytes(vid_bytes)
-        print(vid_arr.shape)
-        # flash(get_classification(vid_arr))
-        digest_from_inference_api = get_inference(vid_arr)
-        local_digest = hashlib.md5(vid_arr.tobytes()).hexdigest()
-        flash(f"{local_digest}\n{digest_from_inference_api}")
+        flash(get_classification(vid_arr))
+        # digest_from_inference_api = get_inference(vid_arr)
+        # local_digest = hashlib.md5(vid_arr.tobytes()).hexdigest()
+        # flash(f"{local_digest}\n{digest_from_inference_api}")
 
     return render_template("Record.html")
 

@@ -49,7 +49,7 @@
   </div>
 
   <p style="margin-top: 60px;">Please choose between recording a video online or uploading a video</p>
-  <p>In both cases the video should be a maximum of 1 second</p>
+  <p>In both cases the video should be a maximum of 2 second</p>
   <br>
   <div class="button-container">
   <a href="/Record"><button class="btn btn-primary" >Record Video</button></a>
@@ -91,7 +91,7 @@
       // Get the first file
       var file = input.files[0];
 
-      // Check if the file is an MP4 video
+      // Check if the file is a WEBM video
       if (file.type === "video/webm") {
         // Create a video element
         var video = document.createElement('video');
@@ -101,7 +101,7 @@
 
         // Wait for the video to load metadata
         video.onloadedmetadata = function() {
-          // Check if the video is less than or equal to 1 second in length
+          // Check if the video is less than or equal to 3 second in length
           if (video.duration <= 3) {
             // Create a FormData object
             var formData = new FormData();
@@ -109,10 +109,11 @@
             // Add the video file to the form data
             formData.append("video", file);
 
-            {{/*  // Send the form data to the server using a POST method
+            {#  // Send the form data to the server using a POST method
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "/");
-            xhr.send(formData);  */}}
+            xhr.send(formData);  #}
+
             fetch('/', {
               method: 'POST',
               body: formData
@@ -134,7 +135,7 @@
           }
         };
       } else {
-        alert("The file must be an MP4 video.");
+        alert("The file must be a WEBM video.");
       }
     }
   }
