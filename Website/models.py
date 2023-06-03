@@ -13,6 +13,11 @@ VID_WIDTH = int(os.environ.get('VID_WIDTH', default=240))
 VID_DURATION = int(os.environ.get('VID_DURATION', default=2))
 TOTAL_OUTPUT_FRAMES = int(os.environ.get('TOTAL_OUTPUT_FRAMES', default=25))
 
+EC2_AZ = os.environ.get('EC2_AZ')
+INSTANCE_ID = os.environ.get('INSTANCE_ID')
+AWS_DEFAULT_REGION = os.environ.get('AWS_DEFAULT_REGION')
+
+boto3.setup_default_session(region_name=AWS_DEFAULT_REGION)
 DYNAMODB_CLIENT = boto3.resource('dynamodb')
 DYNAMODB_CACHE_TABLE = DYNAMODB_CLIENT.Table(CACHE_DYNAMODB_TABLE_NAME)
 
