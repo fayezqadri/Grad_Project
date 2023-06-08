@@ -23,10 +23,14 @@
 <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
   <br>
   <br>
-  
+
     <p>Do you approve this video?</p>
     <div>
-    <button id="approveButton" class="btn btn-primary">Approve</button>
+      <form id="video-form" method="POST" enctype="multipart/form-data" action="/Record">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input type="file" id="video" name="video" accept="video/webm" style="display: none">
+        <button id="approveButton" class="btn btn-primary">Approve</button>
+      </form>
     <button id="recordAgainButton" class="btn btn-secondary">Record Again</button>
     </div>
 </div>
@@ -100,22 +104,32 @@ async function startRecording() {
 
 
 
-function approveRecording() {
-  const formData = new FormData();
-  formData.append('video', new Blob(recordedChunks, { type: recordedChunks[0].type }));
+function approveRecording(e) {
+  e.preventDefault()
+  video_form = document.getElementById("video-form");
+  formdata = new FormData(video_form)
+  video = document.getElementById('video');
+  blob = new Blob(recordedChunks, { type: recordedChunks[0].type });
+  let file = new File(recordedChunks, "video.webm,",{type:"video/webm", lastModified:new Date().getTime()});
+  let container = new DataTransfer();
+  container.items.add(file);
+  video.files = container.files;
+  video_form.submit();
 
-  fetch('/Record', {
+  {#var xhr = new XMLHttpRequest();
+  xhr.open("POST", "/");
+  xhr.send(formData);#}
+
+  {#fetch('/Record', {
     method: 'POST',
     body: formData
   })
   .then((response) => {
-    // Handle the response from the server
-    console.log(response);
+    console.log(response)
   })
   .catch((error) => {
-    // Handle any errors that occur during the fetch request
     console.error(error);
-  });
+  });#}
 
   // Hide the review section and reset the video player
   reviewSection.style.display = 'none';
@@ -140,5 +154,6 @@ function recordAgain() {
 startRecordingButton.addEventListener('click',startRecording);
 approveButton.addEventListener('click', approveRecording);
 recordAgainButton.addEventListener('click', recordAgain);
+document.getElementById("video-form").addEventListener('submit', (event) => {event.preventDefault;}, true)
 </script>
 {% endblock %}

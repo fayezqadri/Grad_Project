@@ -5,23 +5,23 @@
         <meta charset="utf-8"/>
         <meta name = "viewport" content="width=device-width, initial-scale=1"/>
 
-        
+
         <style>
           body {
               background-color: rgb(247, 247, 249);
-              
+
           }
           footer {
   position: fixed;
   left: 0;
   bottom: 0;
   width: 100%;
-  
-  
+
+
 }
 
       </style>
-    
+
     <link
       rel="stylesheet"
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -48,8 +48,11 @@
                     <a class="nac-item nav-link" id="User Manual" href="/Manual"> User Manual</a>
                     <a class="nac-item nav-link" id="About Us" href="/About"> About Us</a>
                 </div>
+                <div class="navbar-nav" style="text-align: right; color: rgba(255,255,255,.5)">
+                  {% if iaz %}&emsp;&emsp;Instance AZ: {{iaz}}{% endif %}
+                  {% if iid %}&emsp;&emsp;Instance ID: {{iid}}{% endif %}
+                </div>
             </div>
-
 
         </nav>
 
@@ -70,7 +73,7 @@
               </button>
             </div>
             {% endif %} {% endfor %} {% endif %} {% endwith %}
-        
+
         <div class="container">
 
             {% block content %}
@@ -82,17 +85,17 @@
         integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
         crossorigin="anonymous"
       ></script>
-      <script
+      {#<script
         src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
         crossorigin="anonymous"
-      ></script>
+      ></script>#}
       <script
         src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
         integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
         crossorigin="anonymous"
       ></script>
-  
+
   {% block javascript %}
       <script type="text/javascript">
         function deleteNote(noteId) {
@@ -106,8 +109,13 @@
   </script>
   {% endblock %}
     </body>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
 <footer>
-  
+
   <img src="static\footer-bg.png" alt="Footer Image" style="display: block; margin: 0 auto; width: 100%; height: 65px;">
 
 </footer>

@@ -8,8 +8,8 @@ import requests
 CACHE_DYNAMODB_TABLE_NAME = os.environ.get('CACHE_DYNAMODB_TABLE_NAME')
 ML_API_DNS_NAME = os.environ.get('ML_API_DNS_NAME')
 ML_API_BASE_PATH = os.environ.get('ML_API_BASE_PATH', default="/api/v1/")
-VID_HEIGHT = int(os.environ.get('VID_HEIGHT', default=240))
-VID_WIDTH = int(os.environ.get('VID_WIDTH', default=240))
+VID_HEIGHT = int(os.environ.get('VID_HEIGHT', default=224))
+VID_WIDTH = int(os.environ.get('VID_WIDTH', default=224))
 VID_DURATION = int(os.environ.get('VID_DURATION', default=2))
 TOTAL_OUTPUT_FRAMES = int(os.environ.get('TOTAL_OUTPUT_FRAMES', default=25))
 

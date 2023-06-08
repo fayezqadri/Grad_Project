@@ -55,13 +55,13 @@
   <a href="/Record"><button class="btn btn-primary" >Record Video</button></a>
   <button style="margin-left: 15px;"class="btn btn-primary" onclick="toggleUpload()">Upload Video</button>
   </div>
-  <div class="upload-container">
+  <div class="upload-container" style="display: none">
     <br>
     <br>
-    <form method="POST" enctype="multipart/form-data" action="/">
+    <form id="upload-form" method="POST" enctype="multipart/form-data" action="/">
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
       <input type="file" id="video" name = "video" accept="video/webm" />
-      <button class="btn btn-primary" onclick="uploadVideo()">Upload</button>
+      <button type="button" id="upload-btn" class="btn btn-primary" onclick="uploadVideo()">Upload</button>
       <br>
       <br>
       <br>
@@ -82,17 +82,35 @@
   }
 
 
+  var hash = {
+    'webm'  : 1,
+  };
+
+  function check_extension(filename,submitId) {
+        var ext = filename.slice(filename.lastIndexOf(".") + 1).toLowerCase();
+        var submitEl = document.getElementById(submitId);
+        if (hash[ext]) {
+          submitEl.disabled = false;
+          return true;
+        } else {
+          alert("Invalid filename, please select another file");
+          submitEl.disabled = true;
+
+          return false;
+        }
+  }
+
   function uploadVideo() {
     // Get the input element
     var input = document.getElementById("video");
+    var upload_form = document.getElementById('upload-form')
 
     // Check if a file has been selected
     if (input.files.length > 0) {
       // Get the first file
       var file = input.files[0];
-
       // Check if the file is a WEBM video
-      if (file.type === "video/webm") {
+      if ((file.type === "video/webm") && (check_extension(file.name, 'upload-btn'))) {
         // Create a video element
         var video = document.createElement('video');
 
@@ -114,7 +132,7 @@
             xhr.open("POST", "/");
             xhr.send(formData);  #}
 
-            fetch('/', {
+            {#fetch('/', {
               method: 'POST',
               body: formData
             })
@@ -125,7 +143,8 @@
             .catch((error) => {
               // Handle any errors that occur during the fetch request
               console.error(error);
-            });
+            });#}
+            upload_form.submit()
 
             // Hide the upload container
             var uploadContainer = document.querySelector('.upload-container');
@@ -136,6 +155,7 @@
         };
       } else {
         alert("The file must be a WEBM video.");
+        return false;
       }
     }
   }
