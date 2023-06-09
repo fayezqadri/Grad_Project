@@ -73,10 +73,12 @@ def get_classification(vid_arr: "np.ndarray[np.uint8].shape[TOTAL_OUTPUT_FRAMES,
 def get_inference(vid_arr: "np.ndarray[np.uint8].shape[TOTAL_OUTPUT_FRAMES, VID_HEIGHT, VID_WIDTH, 3]") -> str:
     # return 234
     try:
-        reponse = requests.post(ML_API_DNS_NAME+ML_API_BASE_PATH+'video-classification', data=vid_arr.tobytes(), headers={'Content-Type': 'application/octet-stream'})
+        response = requests.post(ML_API_DNS_NAME+ML_API_BASE_PATH+'video-classification', data=vid_arr.tobytes(), headers={'Content-Type': 'application/octet-stream'})
     except Exception as e:
         print(e)
         app.logger.error(e)
-        return 'error'
-    return reponse.json()['predicted_class']
+        return f'error: {e}'
+    if 'error' in response.json():
+        return response.json()
+    return response.json()['predicted_class']
 
