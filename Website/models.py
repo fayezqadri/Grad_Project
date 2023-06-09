@@ -40,6 +40,7 @@ def get_vid_arr_from_bytes(video_bytes: bytes) -> "np.ndarray[np.uint8].shape[TO
     try:
         vid_raw, _ = process.run(input=video_bytes, capture_stdout=True, capture_stderr=True)
         vid_arr = np.frombuffer(vid_raw, np.uint8).reshape((TOTAL_OUTPUT_FRAMES, VID_HEIGHT, VID_WIDTH, 3))
+        vid_arr = vid_arr / 255.0
 
         return vid_arr
     except ffmpeg.Error as e:
