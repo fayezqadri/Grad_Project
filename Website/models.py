@@ -4,6 +4,7 @@ import hashlib
 import ffmpeg
 import os
 import requests
+from flask import app
 
 CACHE_DYNAMODB_TABLE_NAME = os.environ.get('CACHE_DYNAMODB_TABLE_NAME')
 ML_API_DNS_NAME = os.environ.get('ML_API_DNS_NAME')
@@ -45,7 +46,10 @@ def get_vid_arr_from_bytes(video_bytes: bytes) -> "np.ndarray[np.uint8].shape[TO
         return vid_arr
     except ffmpeg.Error as e:
         print('stdout:', e.stdout.decode('utf8'))
+        app.logger.error(e.stdout.decode('utf8'))
+
         print('stderr:', e.stderr.decode('utf8'))
+        app.logger.error(e.stderr.decode('utf8'))
         raise e
 
 def get_classification(vid_arr: "np.ndarray[np.uint8].shape[TOTAL_OUTPUT_FRAMES, VID_HEIGHT, VID_WIDTH, 3]") -> str:
@@ -53,10 +57,16 @@ def get_classification(vid_arr: "np.ndarray[np.uint8].shape[TOTAL_OUTPUT_FRAMES,
 
     cached_response = DYNAMODB_CACHE_TABLE.get_item(Key={'np-array-hash': vid_arr_hash_hexdigest})
     if 'Item' in cached_response:
+        app.logger.info(f'Found in cache table video with arr-hash = {vid_arr_hash_hexdigest}. Returning stored prediction.')
+
         return cached_response['Item']['class']
     else:
+        app.logger.info(f"Couldn't find in cache table video with arr-hash = {vid_arr_hash_hexdigest}. Getting inference from ML model.")
+
         pred = get_inference(vid_arr)
         DYNAMODB_CACHE_TABLE.put_item(Item={'np-array-hash': vid_arr_hash_hexdigest, 'class': pred })
+        app.logger.info(f"Got '{pred}' as a prediction from ML model and stored in cache table.")
+
         return pred
 
 
@@ -66,5 +76,7 @@ def get_inference(vid_arr: "np.ndarray[np.uint8].shape[TOTAL_OUTPUT_FRAMES, VID_
         reponse = requests.post(ML_API_DNS_NAME+ML_API_BASE_PATH+'video-classification', data=vid_arr.tobytes(), headers={'Content-Type': 'application/octet-stream'})
     except Exception as e:
         print(e)
+        app.logger.error(e)
+        return 'error'
     return reponse.json()['predicted_class']
 
