@@ -32,7 +32,7 @@ def Record():
             return 'No video file uploaded !', 400
         vid_bytes = vid_file.stream.read()
         vid_arr = get_vid_arr_from_bytes(vid_bytes)
-        flash(get_classification(vid_arr))
+        flash(f"The predicted word from the video is: {get_classification(vid_arr)}")
         return redirect(url_for('views.Record'))
         # digest_from_inference_api = get_inference(vid_arr)
         # local_digest = hashlib.md5(vid_arr.tobytes()).hexdigest()

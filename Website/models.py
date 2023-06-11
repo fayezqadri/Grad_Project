@@ -4,7 +4,9 @@ import hashlib
 import ffmpeg
 import os
 import requests
-from flask import app
+from flask import current_app
+import sys
+app = current_app
 
 CACHE_DYNAMODB_TABLE_NAME = os.environ.get('CACHE_DYNAMODB_TABLE_NAME')
 ML_API_DNS_NAME = os.environ.get('ML_API_DNS_NAME')
@@ -41,7 +43,8 @@ def get_vid_arr_from_bytes(video_bytes: bytes) -> "np.ndarray[np.uint8].shape[TO
     try:
         vid_raw, _ = process.run(input=video_bytes, capture_stdout=True, capture_stderr=True)
         vid_arr = np.frombuffer(vid_raw, np.uint8).reshape((TOTAL_OUTPUT_FRAMES, VID_HEIGHT, VID_WIDTH, 3))
-        vid_arr = vid_arr / 255.0
+        vid_arr = vid_arr
+        app.logger.info(f"vid_arr size: {sys.getsizeof(vid_arr)/1024**2}")
 
         return vid_arr
     except ffmpeg.Error as e:
@@ -74,11 +77,17 @@ def get_inference(vid_arr: "np.ndarray[np.uint8].shape[TOTAL_OUTPUT_FRAMES, VID_
     # return 234
     try:
         response = requests.post(ML_API_DNS_NAME+ML_API_BASE_PATH+'video-classification', data=vid_arr.tobytes(), headers={'Content-Type': 'application/octet-stream'})
+        app.logger.info(f"Sent the follwoing request to ML API: {response.request}")
+        app.logger.info(f"Got the following response from ML API: {response}")
     except Exception as e:
         print(e)
         app.logger.error(e)
         return f'error: {e}'
-    if 'error' in response.json():
-        return response.json()
-    return response.json()['predicted_class']
+    try:
+        rjson = response.json()
+        if 'error' in rjson:
+            return rjson
+        return rjson['predicted_class']
+    except Exception as e:
+        app.logger.error(f"{e}")
 
