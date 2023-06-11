@@ -67,12 +67,18 @@ def get_classification(vid_arr: "np.ndarray[np.uint8].shape[TOTAL_OUTPUT_FRAMES,
         app.logger.info(f"Couldn't find in cache table video with arr-hash = {vid_arr_hash_hexdigest}. Getting inference from ML model.")
 
         pred = get_inference(vid_arr)
+        if pred is None:
+            app.logger.info(f"Got '{pred}' as a prediction from ML model and did not store in cache table.")
+            return None
+
         DYNAMODB_CACHE_TABLE.put_item(Item={'np-array-hash': vid_arr_hash_hexdigest, 'class': pred })
         app.logger.info(f"Got '{pred}' as a prediction from ML model and stored in cache table.")
 
         return pred
 
 
+MAX_RETRIES = 3
+retries = 0
 def get_inference(vid_arr: "np.ndarray[np.uint8].shape[TOTAL_OUTPUT_FRAMES, VID_HEIGHT, VID_WIDTH, 3]") -> str:
     # return 234
     try:
@@ -87,7 +93,15 @@ def get_inference(vid_arr: "np.ndarray[np.uint8].shape[TOTAL_OUTPUT_FRAMES, VID_
         rjson = response.json()
         if 'error' in rjson:
             return rjson
-        return rjson['predicted_class']
+        pred = rjson['predicted_class']
+
+        if pred is None and retries < MAX_RETRIES:
+            retries += 1
+            get_inference(vid_arr)
+        elif pred is None and retries >= MAX_RETRIES:
+            return None
+
+        return pred
     except Exception as e:
         app.logger.error(f"{e}")
 

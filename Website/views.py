@@ -14,7 +14,7 @@ def home():
             return 'No video file uploaded !', 400
         vid_bytes = vid_file.stream.read()
         vid_arr = get_vid_arr_from_bytes(vid_bytes)
-        flash(get_classification(vid_arr))
+        flash(f"The predicted word from the video is: {get_classification(vid_arr)}")
         return redirect(url_for('views.home'))
 
     return render_template("Home.html")
